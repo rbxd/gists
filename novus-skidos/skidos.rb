@@ -48,7 +48,7 @@ repeated = false
 i = 1
 
 while ! repeated do
-  doc = Nokogiri::HTML(open("https://novus.ua/sales/alkogol.html?p=#{i}"))
+  doc = Nokogiri::HTML(URI.open("https://novus.ua/sales/alkogol.html?p=#{i}"))
 
   doc.search('//*[@id="layer-product-list"]/div[1]/ol/li').each do |item|
     parsed = parse_item(item)
@@ -58,13 +58,11 @@ while ! repeated do
       @res[ parsed[:kind] ] = Hash.new
     end
 
-#    if ! @res[ parsed[:kind] ].select { |el| el[:name] == parsed[:name] }.empty?
     if @res[ parsed[:kind] ].has_key? parsed[:name]
       # Stop if there's a duplicate
       puts "Found duplicate: #{parsed}"
       repeated = true
     else
-      # @res[ parsed[:kind] ].push( parsed )
       @res[ parsed[:kind] ][ parsed[:name] ] = parsed
     end
   end
