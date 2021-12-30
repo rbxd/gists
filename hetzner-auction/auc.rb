@@ -26,7 +26,7 @@ filtered = data['server'].select do |el|
   next if el['price'].to_f > 60 or el['ram'] < 32 or el['cpu_benchmark'] < 5000
   next unless el['specials'].include? 'HWR' and el['specials'].include? 'SSD'
 
-  true  
+  true
 #      "key": 1285511,
 #      "name": "SB53",
 #      "cpu": "Intel Xeon E3-1275V6",    "cpu_benchmark": 8564,        "cpu_count": 1 -> always 1,
@@ -44,8 +44,17 @@ end
 
 sorted = filtered.sort { |a,b| a['price'].to_f <=> b['price'].to_f }
 
+def format_price(price)
+  "%.2f" % price.to_f.round(2)
+end
+
 sorted.each do |el|
-  puts "price: #{el['price'].to_f.round(2)}(#{el['fixed_price'] ? "FP" : "  " }) DC: #{el['datacenter'][1]} RAM: #{el['ram']} CPU: #{el['cpu']}(#{el['cpu_benchmark']}) #{el['specials'].join(" ")}" #, descr: #{el['freetext']}"
+  puts "price: " + format_price(el['price']) +
+    "(#{el['fixed_price'] ? "FP" : "  " }) " +
+    "DC: #{el['datacenter'][1]} " +
+    "RAM: #{el['ram']} " +
+    "CPU: #{el['cpu']}(#{el['cpu_benchmark']}) " +
+    "#{el['specials'].join(" ")}" #, descr: #{el['freetext']}"
 end
 
 #def sb_price(name)
