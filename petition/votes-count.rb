@@ -9,39 +9,50 @@ require 'date'
 require 'ruby-progressbar'
 
 repeated = false
-i = 500
-petition_id = 92038
+i = 1
+# TODO get from ARGV
+petition_id = 139292
 
 def woman?(name)
   name.end_with? 'вна' or name.end_with? 'vna'
 end
 
-total = 0
-women = 0
+$total = 0
+$women = 0
 
 progressbar = ProgressBar.create(:title => 'Women',
+    :length => 80,
     :starting_at => 15,
     :total => 30,
     :format => '%t: |%B| %p%% %a')
 
-while ! repeated do
-  doc = Nokogiri::HTML(URI.open("https://petition.president.gov.ua/petition/#{petition_id}/votes/#{i}"), nil, 'UTF-8')
+def final_stats(exception)
+    puts "\n"
+    puts "Total votes: #{$total}, Women: #{$women} (#{(100*$women.to_f/$total).round()}% of all votes)"
+end
 
-  # TODO handle 404
-  doc.search('//div[@class="table_cell name"]').each do |elem|
-    name = elem.text
-    total += 1
+begin
+  while ! repeated do
+    doc = Nokogiri::HTML(URI.open("https://petition.president.gov.ua/petition/#{petition_id}/votes/#{i}"), nil, 'UTF-8')
 
-    if woman?(name)
-      women += 1
+    # TODO handle 404
+    doc.search('//div[@class="table_cell name"]').each do |elem|
+      name = elem.text
+      $total += 1
+
+      if woman?(name)
+        $women += 1
+      end
     end
+
+    progressbar.total = $total
+    progressbar.progress = $women
+
+    i += 1
+    sleep 1
   end
-
-  progressbar.total = total
-  progressbar.progress = women
-
-  i += 1
-  sleep 1
+rescue Interrupt, Exception => e
+    final_stats(e)
 end
 
 t = Time.new
