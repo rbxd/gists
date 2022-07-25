@@ -13,14 +13,18 @@ i = 1
 
 # TODO support full URL
 if ARGV.length != 1
-  puts "Usage: ./votes_count.rb <petition id>"
+  puts "Usage: ./votes_count.rb <petition id or url>"
 
   exit 1
 end
 
-petition_id = ARGV.shift
+arg = ARGV.shift
 
-puts "Petition id: #{petition_id}"
+if m = arg.match(/^(\d+)$/)
+  petition_url = "https://petition.president.gov.ua/petition/#{arg}"
+else
+  petition_url = arg
+end
 
 def woman?(name)
   name.end_with? 'вна' or name.end_with? 'vna'
@@ -29,6 +33,13 @@ end
 $total = 0
 $women = 0
 $t = Time.now
+
+puts "Petition: #{petition_url}"
+
+# TODO handle 404
+doc = Nokogiri::HTML(URI.open("#{petition_url}"), nil, 'UTF-8')
+title = doc.at('h1').text
+puts "Title: #{title}"
 
 progressbar = ProgressBar.create(:title => '  Women',
     :length => 80,
@@ -42,11 +53,9 @@ def final_stats(exception)
     puts "Total votes: #{$total}, Women: #{$women} (#{(100*$women.to_f/$total).round()}% of all votes)"
 end
 
-# TODO output petition URL and title
-
 begin
   while ! repeated do
-    doc = Nokogiri::HTML(URI.open("https://petition.president.gov.ua/petition/#{petition_id}/votes/#{i}"), nil, 'UTF-8')
+    doc = Nokogiri::HTML(URI.open("#{petition_url}/votes/#{i}"), nil, 'UTF-8')
 
     # TODO handle 404
     doc.search('//div[@class="table_cell name"]').each do |elem|
