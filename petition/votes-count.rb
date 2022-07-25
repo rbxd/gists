@@ -27,7 +27,11 @@ else
 end
 
 def woman?(name)
-  name.end_with? 'вна' or name.end_with? 'vna'
+  name.end_with? 'вна' or name.end_with? 'лінічна'
+end
+
+def man?(name)
+  name.end_with? 'вич' or name.end_with? 'лліч'
 end
 
 $total = 0
@@ -64,6 +68,8 @@ begin
 
       if woman?(name)
         $women += 1
+      elsif !man?(name)
+        puts "\n WARN: #{name}"
       end
     end
 
