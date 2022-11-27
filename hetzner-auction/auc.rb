@@ -4,7 +4,7 @@ require 'json'
 require 'date'
 require 'httparty'
 
-LIVE_DATA_URL='https://www.hetzner.com/a_hz_serverboerse/live_data.json?m='
+LIVE_DATA_URL='https://www.hetzner.com/_resources/app/jsondata/live_data_sb.json?m='
 
 data = nil
 
@@ -23,8 +23,8 @@ if ! data or ! data.has_key? 'server'
 end
 
 filtered = data['server'].select do |el|
-  next if el['price'].to_f > 60 or el['ram'] < 32 or el['cpu_benchmark'] < 5000
-  next unless el['specials'].include? 'HWR' and el['specials'].include? 'SSD'
+  next if el['price'].to_f > 60 or el['ram_size'] < 32
+  next unless el['specials'].include? 'SSD'
 
   true
 #      "key": 1285511,
@@ -32,7 +32,7 @@ filtered = data['server'].select do |el|
 #      "cpu": "Intel Xeon E3-1275V6",    "cpu_benchmark": 8564,        "cpu_count": 1 -> always 1,
 #      "is_highio": false,
 #      "is_ecc": true,
-#      "ram": 64,                        "ram_hr": "64 GB",
+#      "ram_size": 64,                        "ram_hr": "64 GB",
 #      "price": "44.5378",               "price_v": "44.5378",         "fixed_price": false,
 #      "hdd_size": 4096,                 "hdd_count": 2,               "hdd_hr": "2x 4 TB",
 #      "next_reduce": 1994,              "next_reduce_hr": "00h 33m",  "next_reduce_timestamp": 1600879038,
@@ -52,23 +52,7 @@ sorted.each do |el|
   puts "price: " + format_price(el['price']) +
     "(#{el['fixed_price'] ? "FP" : "  " }) " +
     "DC: #{el['datacenter'][1]} " +
-    "RAM: #{el['ram']} " +
+    "RAM: #{el['ram_size']} " +
     "CPU: #{el['cpu']}(#{el['cpu_benchmark']}) " +
     "#{el['specials'].join(" ")}" #, descr: #{el['freetext']}"
 end
-
-#def sb_price(name)
-#  name[2...].to_f
-#end
-
-#def price_delta(el)
-#  (sb_price(el['name']) - el['price'].to_f).round(2)
-#end
-
-#servers = filtered.each { |el| el['price_delta'] = price_delta(el) }
-
-#sorted = servers.sort { |a,b| a['price_delta'] <=> b['price_delta'] }
-
-#sorted.each do |el|
-#  puts "Difference: #{el['price_delta']}, price: #{el['price'].to_f.round(2)}, descr: #{el['freetext']}"
-#end
