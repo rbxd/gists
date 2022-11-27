@@ -1,0 +1,12 @@
+{
+  "always_run_in_app" : false,
+  "icon" : {
+    "color" : "teal",
+    "glyph" : "plug"
+  },
+  "name" : "З-34 Світло",
+  "script" : "const colors = {\n  available: {\n    textColor: \"ffffff\",\n    gradientStartColor: \"48d420\",\n    gradientEndColor: \"41961b\"\n  },\n  notAvailable: {\n    textColor: \"f0f0f0\",\n    gradientStartColor: \"9c2424\",\n    gradientEndColor: \"661414\"\n  }\n}\n\nasync function isAvailable() {\n  var request = new Request(`https:\/\/social.kyiv.ua\/zl34\/ping`)\n  request.headers = {\"Accept\": \"application\/json\"}\n\n  let response = await request.loadJSON()\n\n  \/\/ Scriptable will throw an error to widget in case of internet issues\n  return [response[\"lights\"] == \"on\", response[\"error\"]]\n}\n\nfunction drawHeader(isWifiAvailable, errorText, listWidget, textColor) {\n  console.log(errorText);\n  const titleText = isWifiAvailable ? \"Світло є\" : (errorText || \"Світла немає\")\n  const title = listWidget.addText(titleText)\n  title.font = Font.boldRoundedSystemFont(20)\n  listWidget.addSpacer()\n\n  title.textColor = new Color(textColor)\n}\n\nfunction drawCurrentTime(listWidget, textColor) {\n  const dateTime = new Date()\n  let df = new DateFormatter()\n  df.useShortTimeStyle()\n\n  let description = listWidget.addText(`Оновлено ${df.string(dateTime)}`)\n  description.font = Font.mediumSystemFont(13)\n  description.textColor = new Color(textColor)\n}\n\nfunction drawWidgetBackgroundGradient(isWifiAvailable, listWidget, activeColors, textColorHEX) {\n  const startColor = new Color(activeColors.gradientStartColor)\n  const endColor = new Color(activeColors.gradientEndColor)\n\n  const gradient = new LinearGradient()\n  gradient.colors = [startColor, endColor]\n  gradient.locations = [0.0, 1]\n\n  listWidget.backgroundGradient = gradient\n}\n\nasync function run() {\n  const listWidget = new ListWidget()\n\n  const [isWifiAvailable, errorText] = await isAvailable()\n  const activeColors = colors[isWifiAvailable ? \"available\" : \"notAvailable\"]\n  const { textColor } = activeColors\n\n  drawHeader(isWifiAvailable, errorText, listWidget, textColor)\n  drawCurrentTime(listWidget, textColor)\n\n  drawWidgetBackgroundGradient(isWifiAvailable, listWidget, activeColors)\n\n  if (config.runsInApp) {\n    listWidget.presentMedium()\n  }\n\n  Script.setWidget(listWidget)\n  Script.complete()\n}\n\nawait run()",
+  "share_sheet_inputs" : [
+
+  ]
+}
