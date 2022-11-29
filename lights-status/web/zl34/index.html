@@ -121,6 +121,8 @@ function pollServer() {
       console.log('XHR Response: ');
       console.log(response);
 
+      var durationText = '';
+
       if ( response.time && response.since && response.time-response.since>0 ) {
         durationText = 'Вже ';
         durationTime = response.time-response.since;
@@ -142,7 +144,7 @@ function pollServer() {
           // 2:29 - дві години
           // 2:31 - три години
 
-          durationText += durationTime
+          durationText += durationHours
 
           if (durationHours>20 && durationHours%10==1) {
             durationText += ' годину';
