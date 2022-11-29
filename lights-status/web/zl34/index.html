@@ -36,10 +36,20 @@
       color: #f0f0f0;
     }
 
-    #countdown {
+    #duration {
       font-family: 'Roboto Condensed', sans-serif;
       font-weight: 300;
-      font-size: smaller;
+      font-size: 2rem;
+      color: #f0f0f0;
+    }
+
+    #countdown {
+      flex: none;
+      margin:0 auto;
+      margin-bottom: 15px;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
       color: #f0f0f0;
     }
 
@@ -73,8 +83,8 @@
       margin:0 auto;
       margin-bottom: 25px;
       font-family: 'Roboto Condensed', sans-serif;
-      font-size: smaller;
-      color: #0f0f0f;
+      font-size: 12px;
+      color: #a0a0a0;
     }
   </style>
 </head>
@@ -82,11 +92,13 @@
 
 <div class='container'>
   <div id='banner'></div>
-  <div id='countdown'>Оновлення через: <span id='seconds'>40</span> сек.</div>
+  <div id='duration'></div>
 </div>
 
+<div id='countdown'>Оновлення через: <span id='seconds'>40</span> сек.</div>
+
 <div class='footer'>
-  <a class='footer' href='https://t.me/nsfwninja'>Contact</a> | <a class='footer' href='widget.html'>Widget</a>
+  <a class='footer' href='https://t.me/nsfwninja'>Contact</a> | <a class='footer' href='https://github.com/rbxd/gists/tree/master/lights-status'>Github</a> | <a class='footer' href='widget.html'>Widget</a>
 </div>
 <script>
 let timerInterval;
@@ -102,18 +114,62 @@ function pollServer() {
 
   xhr.onload = function() {
     if (xhr.status >= 200 && xhr.status < 300) {
-      console.log(JSON.parse(xhr.responseText));
+      // TODO handle JSON parse exception
+      response = JSON.parse(xhr.responseText);
 
-      if (JSON.parse(xhr.responseText).lights === 'on') {
+      // DEBUG
+      console.log('XHR Response: ');
+      console.log(response);
+
+      if ( response.time && response.since && response.time-response.since>0 ) {
+        durationText = 'Вже ';
+        durationTime = response.time-response.since;
+
+        if (0<durationTime && durationTime<1200) {
+          durationText += 'кілька хвилин';
+        }
+        else if (1200<durationTime && durationTime<2400) {
+          durationText += 'пів-години';
+        }
+        else if (2400<durationTime && durationTime<4800) {
+          durationText += 'годину';
+        }
+        else if (4800<durationTime && durationTime<6600) {
+          durationText += 'півтори години';
+        }
+        else {
+          durationHours = Math.round(durationTime/3600);
+          // 2:29 - дві години
+          // 2:31 - три години
+
+          durationText += durationTime
+
+          if (durationHours>20 && durationHours%10==1) {
+            durationText += ' годину';
+          }
+          else if ( (1<durationHours && durationHours<5) ||
+              ( durationHours > 20 && 1<durationHours%10 && durationHours%10<5) ) {
+            durationText += ' години';
+          }
+          else {
+            durationText += ' годин';
+          }
+        }
+      }
+
+      if ( response.lights === 'on') {
         document.getElementById("banner").innerHTML = 'Світло є';
+        document.getElementById("duration").innerHTML = '';
         document.getElementById("content").className  = 'lightson';
       }
-      else if (JSON.parse(xhr.responseText).lights === 'off') {
+      else if (response.lights === 'off') {
         document.getElementById("banner").innerHTML = 'Світла немає';
+        document.getElementById("duration").innerHTML = durationText;
         document.getElementById("content").className  = 'lightsoff';
       }
       else {
         document.getElementById("banner").innerHTML = 'Невідомо';
+        document.getElementById("duration").innerHTML = '';
         document.getElementById("content").className  = 'lightsunknown';
       }
     }
@@ -133,7 +189,6 @@ function startTimer(timerSeconds) {
 
   timerInterval = setInterval(function () {
     if (second >= timerSeconds) {
-      console.log('It is time!');
       pollServer();
       second = 0;
     };
