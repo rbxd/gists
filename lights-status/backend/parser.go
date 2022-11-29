@@ -3,6 +3,7 @@ package main
 import (
     "github.com/bradfitz/gomemcache/memcache"
     "encoding/json"
+    "time"
     "os"
     "log"
 )
@@ -27,17 +28,15 @@ type apiResponse struct {
     Endpoints []endpointStatus        `json:"endpoints"`
 }
 
-func getStatusMemcache(mc memcache.Client, key string) (apiResponse, error) {
-    var systemStatus apiResponse
+func getStatusMemcache(mc *memcache.Client, key string) (*apiResponse, error) {
+    systemStatus := new(apiResponse)
 
     mcVal, err := mc.Get(key)
-
     if err != nil {
       return nil, err
     }
 
     err = json.Unmarshal(mcVal.Value, &systemStatus)
-
     if err != nil {
         return nil, err
     }
@@ -55,9 +54,17 @@ func main() {
 
     // get initial status from memcached
     //      from the previous runs
-    var systemStatus apiResponse
+    systemStatus, err := getStatusMemcache(mc, mcKey)
 
-    systemStatus = getStatusMemcache(mc, mcKey)
+    if err != nil || systemStatus == nil {
+        l.Printf("Did not get system Status from mc: ", err)
+        systemStatus = new(apiResponse)
+    } else {
+        l.Printf("Loaded status:")
+        l.Printf("\tLights:\t'%s'", systemStatus.Lights)
+        l.Printf("\tSince:\t%d (%d seconds ago)", systemStatus.Since, time.Now().Unix()-systemStatus.Since)
+        l.Printf("\tPosted:\t%d (%d seconds ago)", systemStatus.Time, time.Now().Unix()-systemStatus.Time)
+    }
 
     // DEBUG
     l.Printf("SYSTEM STATUS: ", systemStatus)

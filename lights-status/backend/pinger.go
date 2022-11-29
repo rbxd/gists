@@ -77,18 +77,48 @@ func getStatus(status []endpointStatus) string {
     return "unknown"
 }
 
+// load status from memcache
+func getStatusMemcache(mc *memcache.Client, key string) (*apiResponse, error) {
+    systemStatus := new(apiResponse)
+
+    mcVal, err := mc.Get(key)
+    if err != nil {
+      return nil, err
+    }
+
+    err = json.Unmarshal(mcVal.Value, &systemStatus)
+    if err != nil {
+        return nil, err
+    }
+
+    return systemStatus, nil
+}
 
 func main() {
     // TODO get server address, key name from configuration
     mc := memcache.New("127.0.0.1:11211")
-    mcKey := "123ping"
+    mcKey := "zl34_ping"
     var mcExpiry int32 = 720
 
     l := log.New(os.Stdout, "[Pinger.go] ", log.Lmsgprefix | log.LstdFlags)
 
-    // TODO get initial status from memcached
+    // get initial status from memcached
     //      from the previous runs
-    var systemStatus apiResponse
+    systemStatus, err := getStatusMemcache(mc, mcKey)
+
+    if err != nil || systemStatus == nil {
+        l.Printf("Did not get system status from memcache: ", err)
+        systemStatus = new(apiResponse)
+    } else {
+        // DEBUG
+        l.Printf("Loaded status:")
+        l.Printf("\tLights:\t'%s'", systemStatus.Lights)
+        l.Printf("\tSince:\t%d (%d seconds ago)", systemStatus.Since, time.Now().Unix()-systemStatus.Since)
+        l.Printf("\tPosted:\t%d (%d seconds ago)", systemStatus.Time, time.Now().Unix()-systemStatus.Time)
+    }
+
+    // DEBUG
+    l.Printf("SYSTEM STATUS: ", systemStatus)
 
     for {
         var pingStatus = make([]endpointStatus, len(pingEndpoints))
