@@ -143,6 +143,7 @@ func main() {
         storeVal, _ := json.Marshal(systemStatus)
         mc.Set(&memcache.Item{Key: mcKey, Value: storeVal, Expiration: mcExpiry})
 
-        time.Sleep(10 * time.Second)
+        // TODO get interval from configuration
+        time.Sleep(20 * time.Second)
     }
 }
