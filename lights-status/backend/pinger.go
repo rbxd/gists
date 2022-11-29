@@ -111,14 +111,14 @@ func main() {
         systemStatus = new(apiResponse)
     } else {
         // DEBUG
-        l.Printf("Loaded status:")
+        l.Printf("Loaded status from memcached('%s'):", mcKey)
         l.Printf("\tLights:\t'%s'", systemStatus.Lights)
         l.Printf("\tSince:\t%d (%d seconds ago)", systemStatus.Since, time.Now().Unix()-systemStatus.Since)
         l.Printf("\tPosted:\t%d (%d seconds ago)", systemStatus.Time, time.Now().Unix()-systemStatus.Time)
     }
 
     // DEBUG
-    l.Printf("SYSTEM STATUS: ", systemStatus)
+    //l.Printf("SYSTEM STATUS: ", systemStatus)
 
     for {
         var pingStatus = make([]endpointStatus, len(pingEndpoints))
@@ -157,7 +157,7 @@ func main() {
         if lightStatus != systemStatus.Lights {
             l.Printf("Change of status. From: '%s' to: '%s'", systemStatus.Lights, lightStatus)
 
-            systemStatus = apiResponse{
+            systemStatus = &apiResponse{
                 Lights:     lightStatus,
                 Time:       time.Now().Unix(),
                 Since:      time.Now().Unix(),

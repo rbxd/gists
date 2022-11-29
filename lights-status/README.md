@@ -1,5 +1,9 @@
 TODO
 - make a README
 - Dockerize
-- change to using memcached as a backend
+- add tests
+- add admin endpoint
+
+DONE
 - add multiple endpoints
+- use memcached as a backend
