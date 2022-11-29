@@ -123,7 +123,10 @@ func main() {
 
         lightStatus := getStatus(pingStatus)
 
+        // TODO handle empty systemStatus - silently set it to the current status
         if lightStatus != systemStatus.Lights {
+            l.Printf("Change of status. From: '%s' to: '%s'", systemStatus.Lights, lightStatus)
+
             systemStatus = apiResponse{
                 Lights:     lightStatus,
                 Time:       time.Now().Unix(),
@@ -135,7 +138,7 @@ func main() {
         } // TODO handle corner case: status remains "partial", but the endpoints status changed
 
         // DEBUG
-        l.Printf("SYSTEM STATUS: ", systemStatus)
+        //l.Printf("SYSTEM STATUS: ", systemStatus)
 
         storeVal, _ := json.Marshal(systemStatus)
         mc.Set(&memcache.Item{Key: mcKey, Value: storeVal, Expiration: mcExpiry})
