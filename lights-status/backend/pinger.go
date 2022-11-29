@@ -38,10 +38,6 @@ func init() {
             SymName: "Вхід 1",
             Hostname: "ord.tuxedo-in.ts.net",
         },
-        netHost {
-            SymName: "Вхід 2",
-            Hostname: "dfw.tuxedo-in.ts.net",
-        },
     }
 }
 
@@ -115,6 +111,7 @@ func main() {
         l.Printf("\tLights:\t'%s'", systemStatus.Lights)
         l.Printf("\tSince:\t%d (%d seconds ago)", systemStatus.Since, time.Now().Unix()-systemStatus.Since)
         l.Printf("\tPosted:\t%d (%d seconds ago)", systemStatus.Time, time.Now().Unix()-systemStatus.Time)
+        l.Printf("FULL STATUS: ", systemStatus)
     }
 
     // DEBUG
@@ -165,7 +162,8 @@ func main() {
             }
         } else {
             systemStatus.Time = time.Now().Unix()
-        } // TODO handle corner case: status remains "partial", but the endpoints status changed
+            systemStatus.Endpoints = pingStatus
+        }
 
         // DEBUG
         //l.Printf("SYSTEM STATUS: ", systemStatus)
