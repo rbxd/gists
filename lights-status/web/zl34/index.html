@@ -109,6 +109,54 @@ function startPolling() {
   startTimer(40);
 }
 
+function numSuffix(num) {
+  if (num==1 || (num>20 && num%10==1)) {
+    return 'у';
+  }
+  else if ( (1<num && num<5) ||
+      ( num > 20 && 1<num%10 && num%10<5) ) {
+    return 'и';
+  }
+  else {
+    return '';
+  }
+}
+
+function secondsToHours(seconds) {
+  return parseInt(seconds/3600);
+}
+
+function secondsToMinutes(seconds) {
+  return parseInt( (seconds%3600)/60 );
+}
+
+function secondsToText(seconds) {
+  if (!parseInt(seconds)) {
+    return 'деякий час';
+  }
+
+  var hours = secondsToHours(seconds);
+  var minutes = secondsToMinutes(seconds);
+
+  if (hours==0 && minutes<5) {
+    return 'кілька хвилин';
+  }
+
+  var duration = [];
+
+  if (hours > 0) {
+    duration.push(hours);
+    duration.push('годин' + numSuffix(hours));
+  }
+
+  if (minutes > 0) {
+    duration.push(minutes);
+    duration.push('хвилин' + numSuffix(minutes));
+  }
+
+  return duration.join(' ');
+}
+
 function pollServer() {
   var xhr = new XMLHttpRequest();
 
@@ -125,38 +173,7 @@ function pollServer() {
 
       if ( response.time && response.since && response.time-response.since>0 ) {
         durationText = 'Вже ';
-        durationTime = response.time-response.since;
-
-        if (0<durationTime && durationTime<1200) {
-          durationText += 'кілька хвилин';
-        }
-        else if (1200<durationTime && durationTime<2400) {
-          durationText += 'пів-години';
-        }
-        else if (2400<durationTime && durationTime<4800) {
-          durationText += 'годину';
-        }
-        else if (4800<durationTime && durationTime<6600) {
-          durationText += 'півтори години';
-        }
-        else {
-          durationHours = Math.round(durationTime/3600);
-          // 2:29 - дві години
-          // 2:31 - три години
-
-          durationText += durationHours
-
-          if (durationHours>20 && durationHours%10==1) {
-            durationText += ' годину';
-          }
-          else if ( (1<durationHours && durationHours<5) ||
-              ( durationHours > 20 && 1<durationHours%10 && durationHours%10<5) ) {
-            durationText += ' години';
-          }
-          else {
-            durationText += ' годин';
-          }
-        }
+        durationText += secondsToText(response.time-response.since);
       }
 
       if ( response.lights === 'on') {
