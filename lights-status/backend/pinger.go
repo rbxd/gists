@@ -114,23 +114,18 @@ func main() {
         l.Printf("FULL STATUS: ", systemStatus)
     }
 
-    // DEBUG
-    //l.Printf("SYSTEM STATUS: ", systemStatus)
-
     for {
         var pingStatus = make([]endpointStatus, len(pingEndpoints))
 
         for i:=0; i<len(pingEndpoints); i++ {
             var stdout, stderr bytes.Buffer
+            up := true
 
             cmd := exec.Command("ping", "-c 1", "-W 1", pingEndpoints[i].Hostname)
-	          cmd.Stdout = &stdout
+            cmd.Stdout = &stdout
             cmd.Stderr = &stderr
 
             err := cmd.Run()
-
-            up := true
-
             if err != nil {
                 // Should be put in DEBUG log:
                 //l.Printf("Error during execution: ", err)
@@ -145,14 +140,11 @@ func main() {
             }
         }
 
-        // DEBUG
-        //l.Printf("PING STATUS: ", pingStatus)
-
         lightStatus := getStatus(pingStatus)
 
         // TODO handle empty systemStatus - silently set it to the current status
         if lightStatus != systemStatus.Lights {
-            l.Printf("Change of status. From: '%s' to: '%s'", systemStatus.Lights, lightStatus)
+            l.Printf("Change of status. From: '%s' to: '%s' after %d sec", systemStatus.Lights, lightStatus, time.Now().Unix()-systemStatus.Since)
 
             systemStatus = &apiResponse{
                 Lights:     lightStatus,
