@@ -94,7 +94,10 @@ func main() {
 	mc := memcache.New("127.0.0.1:11211")
 	mcKey := "zl34_ping"
 	var mcExpiry int32 = 720
-	cooldownLimit := 3
+
+	var cooldownTimeLimit int64 = 300
+	var cooldownSince int64 = 0
+	systemStatusCached := new(apiResponse)
 
 	l := log.New(os.Stdout, "[Pinger.go] ", log.Lmsgprefix|log.LstdFlags)
 
@@ -114,12 +117,11 @@ func main() {
 		l.Printf("FULL STATUS: ", systemStatus)
 	}
 
-	var cooldownSince int64 = 0
-	cooldownCounter := 0
-
 	for {
 		var pingStatus = make([]endpointStatus, len(pingEndpoints))
 
+		// TODO move out to a function
+		// TODO parallelize
 		for i := 0; i < len(pingEndpoints); i++ {
 			var stdout, stderr bytes.Buffer
 			up := true
@@ -144,49 +146,55 @@ func main() {
 		}
 
 		lightStatus := getStatus(pingStatus)
+		//l.Printf("lightStatus: ", lightStatus)
 
-		//l.Printf("DEBUG: cooldownCounter:%d, cooldownSince:%d, now:%d", cooldownCounter, cooldownSince, time.Now().Unix())
+		// handle empty systemStatus - set it to the current status
+		if systemStatus.Lights == "" {
+			systemStatus = &apiResponse{
+				Lights:    lightStatus,
+				Time:      time.Now().Unix(),
+				Since:     time.Now().Unix(),
+				Endpoints: pingStatus,
+			}
 
-		// TODO handle empty systemStatus - silently set it to the current status
+			l.Printf("No previous status recorded. Just putting the current status as is:")
+			l.Printf("\tSTATUS:\t", systemStatus)
+		}
+
+		// change of status
 		if lightStatus != systemStatus.Lights {
-			// cooldown period except for when coming back up
-			if lightStatus != "on" && cooldownCounter < cooldownLimit {
-				l.Printf("Change of status. From: '%s' to: '%s' (cooldown: %d)", systemStatus.Lights, lightStatus, cooldownLimit-cooldownCounter)
+			// Happened during a cooldown period
+			if time.Now().Unix() <= cooldownSince+cooldownTimeLimit && lightStatus == systemStatusCached.Lights {
+				l.Printf("Status changed back to '%s' after %d seconds (within cooldown period)",
+					lightStatus,
+					time.Now().Unix()-cooldownSince)
 
-				// on the first iteration, remember time
-				if cooldownCounter == 0 {
-					cooldownSince = time.Now().Unix()
-				}
-
-				cooldownCounter++
+				systemStatus = systemStatusCached
+				cooldownSince = time.Now().Unix()
 			} else {
-				eventSince := time.Now().Unix()
-				if cooldownSince != 0 {
-					eventSince = cooldownSince
-
-					cooldownCounter = 0
-					cooldownSince = 0
+				// outside of cooldown - cache previous status
+				if time.Now().Unix() > cooldownSince+cooldownTimeLimit {
+					systemStatusCached = systemStatus
 				}
 
-				l.Printf("Change of status. From: '%s' to: '%s' after %d sec", systemStatus.Lights, lightStatus, eventSince-systemStatus.Since)
+				cooldownSince = time.Now().Unix()
+
+				l.Printf("Change of status. From: '%s' to: '%s' after %d sec",
+					systemStatus.Lights,
+					lightStatus,
+					time.Now().Unix()-systemStatus.Since)
 
 				systemStatus = &apiResponse{
 					Lights:    lightStatus,
 					Time:      time.Now().Unix(),
-					Since:     eventSince,
+					Since:     time.Now().Unix(),
 					Endpoints: pingStatus,
 				}
 			}
-		} else {
-			if cooldownCounter > 0 || cooldownSince > 0 {
-				cooldownCounter = 0
-				cooldownSince = 0
-				l.Printf("No change of status. Cooldown reset.")
-			}
-
-			systemStatus.Time = time.Now().Unix()
-			systemStatus.Endpoints = pingStatus
 		}
+
+		systemStatus.Time = time.Now().Unix()
+		systemStatus.Endpoints = pingStatus
 
 		// DEBUG
 		//l.Printf("SYSTEM STATUS: ", systemStatus)
@@ -196,6 +204,6 @@ func main() {
 		mc.Set(&memcache.Item{Key: mcKey, Value: storeVal, Expiration: mcExpiry})
 
 		// TODO get interval from configuration
-		time.Sleep(20 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
