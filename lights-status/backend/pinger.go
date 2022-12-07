@@ -164,20 +164,18 @@ func main() {
 		// change of status
 		if lightStatus != systemStatus.Lights {
 			// Happened during a cooldown period
+			// And the status was reset
 			if time.Now().Unix() <= cooldownSince+cooldownTimeLimit && lightStatus == systemStatusCached.Lights {
 				l.Printf("Status changed back to '%s' after %d seconds (within cooldown period)",
 					lightStatus,
 					time.Now().Unix()-cooldownSince)
 
 				systemStatus = systemStatusCached
-				cooldownSince = time.Now().Unix()
 			} else {
 				// outside of cooldown - cache previous status
 				if time.Now().Unix() > cooldownSince+cooldownTimeLimit {
 					systemStatusCached = systemStatus
 				}
-
-				cooldownSince = time.Now().Unix()
 
 				l.Printf("Change of status. From: '%s' to: '%s' after %d sec",
 					systemStatus.Lights,
@@ -191,6 +189,7 @@ func main() {
 					Endpoints: pingStatus,
 				}
 			}
+			cooldownSince = time.Now().Unix()
 		}
 
 		systemStatus.Time = time.Now().Unix()
