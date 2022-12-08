@@ -139,7 +139,7 @@ function secondsToText(seconds) {
   var minutes = secondsToMinutes(seconds);
 
   if (hours==0 && minutes<5) {
-    return 'кілька хвилин';
+    return 'щойно';
   }
 
   var duration = [];
@@ -172,8 +172,7 @@ function pollServer() {
       var durationText = '';
 
       if ( response.time && response.since && response.time-response.since>0 ) {
-        durationText = 'Вже ';
-        durationText += secondsToText(response.time-response.since);
+        durationText = secondsToText(response.time-response.since);
       }
 
       if ( response.lights === 'on') {
