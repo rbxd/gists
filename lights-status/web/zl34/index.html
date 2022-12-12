@@ -98,7 +98,7 @@
 <div id='countdown'>Оновлення через: <span id='seconds'>40</span> сек.</div>
 
 <div class='footer'>
-  <a class='footer' href='https://t.me/nsfwninja'>Contact</a> | <a class='footer' href='https://github.com/rbxd/gists/tree/master/lights-status'>Github</a> | <a class='footer' href='widget.html'>Widget</a>
+  <a class='footer' href='https://t.me/nsfwninja'>Contact</a> | <a class='footer' href='https://github.com/rbxd/gists/tree/master/lights-status'>Github</a> | <a class='footer' href='widget.html'>Widget</a> | <a class='footer' href='stats.html'>Stats</a>
 </div>
 <script>
 let timerInterval;
@@ -177,7 +177,7 @@ function pollServer() {
 
       if ( response.lights === 'on') {
         document.getElementById("banner").innerHTML = 'Світло є';
-        document.getElementById("duration").innerHTML = '';
+        document.getElementById("duration").innerHTML = durationText;
         document.getElementById("content").className  = 'lightson';
       }
       else if (response.lights === 'off') {
