@@ -3,6 +3,7 @@ TODO
 - Dockerize
 - add tests
 - add admin endpoint
+- show past events duration on the stats page
 
 DONE
 - add multiple endpoints
