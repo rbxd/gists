@@ -177,6 +177,7 @@ func main() {
 					systemStatusCached = systemStatus
 				}
 
+				// TODO which endpoint changed status?
 				l.Printf("Change of status. From: '%s' to: '%s' after %d sec",
 					systemStatus.Lights,
 					lightStatus,
