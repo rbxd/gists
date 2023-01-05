@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/bradfitz/gomemcache/memcache"
 	"log"
+	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -77,6 +78,7 @@ func getStatusMemcache(mc *memcache.Client, key string) (*apiResponse, error) {
 	systemStatus := new(apiResponse)
 
 	mcVal, err := mc.Get(key)
+	fmt.Printf("DEBUG: status from memcache: %s\n ", mcVal)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +168,7 @@ func main() {
 			// Happened during a cooldown period
 			// And the status was reset
 			if time.Now().Unix() <= cooldownSince+cooldownTimeLimit && lightStatus == systemStatusCached.Lights {
-				l.Printf("Status changed back to '%s' after %d seconds (within cooldown period)",
+				l.Printf("Cooldown: back to '%s' after %d seconds",
 					lightStatus,
 					time.Now().Unix()-cooldownSince)
 
