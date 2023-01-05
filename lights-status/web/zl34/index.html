@@ -113,6 +113,19 @@ function startPolling() {
   startTimer(40);
 }
 
+function numDays(num) {
+  if (num==1 || (num>20 && num%10==1)) {
+    return 'день';
+  }
+  else if ( (1<num && num<5) ||
+      ( num > 20 && 1<num%10 && num%10<5) ) {
+    return 'дні';
+  }
+  else {
+    return 'днів';
+  }
+}
+
 function numSuffix(num) {
   if (num==1 || (num>20 && num%10==1)) {
     return 'у';
@@ -126,12 +139,16 @@ function numSuffix(num) {
   }
 }
 
+function secondsToDays(seconds) {
+  return parseInt(seconds/86400);
+}
+
 function secondsToHours(seconds) {
   return parseInt(seconds/3600);
 }
 
 function secondsToMinutes(seconds) {
-  return parseInt( (seconds%3600)/60 );
+  return parseInt(seconds/60);
 }
 
 function secondsToText(seconds) {
@@ -139,26 +156,29 @@ function secondsToText(seconds) {
     return 'деякий час';
   }
 
-  var hours = secondsToHours(seconds);
-  var minutes = secondsToMinutes(seconds);
+  var days = secondsToDays(seconds);
+  var hours = secondsToHours(seconds)%24;
+  var minutes = secondsToMinutes(seconds)%60;
 
-  if (hours==0 && minutes<5) {
+  if (days == 0 && hours==0 && minutes<5) {
     return 'щойно';
   }
 
   var duration = [];
 
+  if (days > 0) {
+    duration.push([days, numDays(days)].join(' '));
+  }
+
   if (hours > 0) {
-    duration.push(hours);
-    duration.push('годин' + numSuffix(hours));
+    duration.push([hours, 'годин' + numSuffix(hours)].join(' '));
   }
 
-  if (minutes > 0) {
-    duration.push(minutes);
-    duration.push('хвилин' + numSuffix(minutes));
+  if (minutes > 0 && days==0) {
+    duration.push([minutes, 'хвилин' + numSuffix(minutes)].join(' '));
   }
 
-  return duration.join(' ');
+  return duration.join(', ');
 }
 
 function pollServer() {
