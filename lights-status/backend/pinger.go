@@ -36,7 +36,7 @@ func init() {
 	pingEndpoints = []netHost{
 		netHost{
 			SymName:  "Вхід 1",
-			Hostname: "ord.tuxedo-in.ts.net",
+			Hostname: "dfw.tuxedo-in.ts.net",
 		},
 	}
 }
