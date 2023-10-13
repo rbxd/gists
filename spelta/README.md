@@ -12,3 +12,8 @@ ruby spelta.rb
 ```
 
 (or put it in crontab)
+
+## TODO
+- respond to a command in Telegram
+- add tests
+- Dockerize
