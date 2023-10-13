@@ -65,7 +65,7 @@ end
 
 unless removed.empty?
   msg << "*Закінчилося:*"
-  added.each { |item| msg << "- #{item}" }
+  removed.each { |item| msg << "- #{item}" }
 end
 
 unless msg.empty?
