@@ -43,17 +43,10 @@ if File.exist?(PREV_ITEMS)
   end
 end
 
-def compare_arrays(a, b)
-  added = []
-  removed = []
+prev_items.sort!
 
-  added = b.sort.reject { |_| a.include? _ }
-  removed = a.sort.reject { |_| b.include? _ }
-
-  return added, removed
-end
-
-added, removed = compare_arrays(prev_items, items)
+added = items-prev_items
+removed = prev_items-items
 
 msg = []
 
