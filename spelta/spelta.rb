@@ -4,6 +4,7 @@ require 'dotenv'
 require 'httparty'
 require 'json'
 require 'telegram/bot'
+require 'awesome_print'
 
 Dotenv.load
 
@@ -38,7 +39,7 @@ prev_items = []
 if File.exist?(PREV_ITEMS)
   File.open(PREV_ITEMS, "r") do |f|
     f.each_line do |line|
-      prev_items << line
+      prev_items << line.chomp unless line.chomp.empty?
     end
   end
 end
@@ -67,6 +68,8 @@ unless msg.empty?
   end
 end
 
-File.open(PREV_ITEMS, "w") do |file|
-  file.write items.join("\n")
+if ! added.empty? or ! removed.empty?
+  File.open(PREV_ITEMS, "w") do |file|
+    file.write items.join("\n")
+  end
 end
