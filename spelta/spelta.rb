@@ -30,8 +30,8 @@ begin
 
   items = res.parsed_response['menu'].map { |x| x['name'] }.sort
 rescue
-  # if for watever reasons we can't get it - assume it's empty
-  items = []
+  # if for watever reasons we can't get it - just exit
+  exit 1
 end
 
 prev_items = []
@@ -48,27 +48,21 @@ prev_items.sort!
 
 added = items-prev_items
 removed = prev_items-items
-
-msg = []
-
-unless added.empty?
-  msg << "*Додано:*"
-  added.each { |item| msg << "- #{item}" }
-  msg << ""
-end
-
-unless removed.empty?
-  msg << "*Закінчилося:*"
-  removed.each { |item| msg << "- #{item}" }
-end
-
-unless msg.empty?
-  Telegram::Bot::Client.run(TG_BOT_TOKEN) do |bot|
-    bot.api.send_message(chat_id: TG_CHAT_ID, text: msg.join("\n"), parse_mode: 'markdown')
-  end
-end
+remains = prev_items&items
 
 if ! added.empty? or ! removed.empty?
+  msg = []
+
+  added.each   { |i| msg << "`+ `#{i}" }
+  remains.each { |i| msg << "`  `#{i}" }
+  removed.each { |i| msg << "`- `#{i}" }
+
+  unless msg.empty?
+    Telegram::Bot::Client.run(TG_BOT_TOKEN) do |bot|
+      bot.api.send_message(chat_id: TG_CHAT_ID, text: msg.join("\n"), parse_mode: 'markdown')
+    end
+  end
+
   File.open(PREV_ITEMS, "w") do |file|
     file.write items.join("\n")
   end
