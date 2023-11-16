@@ -28,7 +28,7 @@ begin
     }
   )
 
-  items = res.parsed_response['menu'].map { |x| x['name'] }.sort
+  items = res.parsed_response['menu'].map { |x| x['name'] }.reject { |x| x.end_with? 'пек' }.sort
 rescue
   # if for watever reasons we can't get it - just exit
   exit 1
