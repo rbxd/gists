@@ -36,7 +36,7 @@ func init() {
 	pingEndpoints = []netHost{
 		netHost{
 			SymName:  "Вхід 1",
-			Hostname: "dfw.tuxedo-in.ts.net",
+			Hostname: "atl.tuxedo-in.ts.net",
 		},
 	}
 }
@@ -97,7 +97,7 @@ func main() {
 	mcKey := "zl34_ping"
 	var mcExpiry int32 = 720
 
-	var cooldownTimeLimit int64 = 300
+	var cooldownTimeLimit int64 = 1000
 	var cooldownSince int64 = 0
 	systemStatusCached := new(apiResponse)
 
@@ -168,7 +168,8 @@ func main() {
 			// Happened during a cooldown period
 			// And the status was reset
 			if time.Now().Unix() <= cooldownSince+cooldownTimeLimit && lightStatus == systemStatusCached.Lights {
-				l.Printf("Cooldown: back to '%s' after %d seconds",
+				l.Printf("[%d] Cooldown: back to '%s' after %d seconds",
+					time.Now().Unix(),
 					lightStatus,
 					time.Now().Unix()-cooldownSince)
 
@@ -180,7 +181,8 @@ func main() {
 				}
 
 				// TODO which endpoint changed status?
-				l.Printf("Change of status. From: '%s' to: '%s' after %d sec",
+				l.Printf("[%d] Change of status. From: '%s' to: '%s' after %d sec",
+					time.Now().Unix(),
 					systemStatus.Lights,
 					lightStatus,
 					time.Now().Unix()-systemStatus.Since)

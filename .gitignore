@@ -1,5 +1,7 @@
 vendor
+__pycache__
 Gemfile.lock
 *.json
 pinger
 .env
+venv
