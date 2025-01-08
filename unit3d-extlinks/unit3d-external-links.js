@@ -14,12 +14,12 @@
 
 /* CONFIGURATION */
 // 'Letterboxd', 'Rotten Tomatoes', 'PassThePopcorn', 'BroadcasTheNet', 'HDBits', 'Cinematik', 'Karagarga', 'BeyondHD', 'Blutopia', 'AsianCinema', 'Cinemaggedon', 'PTerClub', 'MoreThanTV', 'Aither', 'Anthelion', 'Retroflix', 'TV Vault', 'HUNO', 'Open Subtitles'
-const ENABLED_SITES = ['Letterboxd']; //, 'Blutopia', 'Aither', 'Open Subtitles'];
+const ENABLED_SITES = ['Letterboxd', 'tvcharts']; //, 'Blutopia', 'Aither', 'Open Subtitles'];
 const ICON_FONT_SIZE = '24px';
 /* ------------- */
 
 const MOVIE_ONLY_SITES = ['Letterboxd', 'PassThePopcorn', 'Anthelion'];
-const TV_ONLY_SITES = ['BroadcasTheNet', 'TV Vault'];
+const TV_ONLY_SITES = ['BroadcasTheNet', 'TV Vault', 'tvcharts'];
 
 const SITES = [{
         name: 'Letterboxd',
@@ -28,6 +28,12 @@ const SITES = [{
         imdbSearchUrl: 'https://letterboxd.com/imdb/$Id',
         tmdbSearchUrl: 'https://letterboxd.com/tmdb/$Id',
         nameSearchUrl: 'https://letterboxd.com/search/?q=$Id'
+    },
+    {
+        name: 'tvcharts',
+        icon: 'fa-brands fa-square-letterboxd',
+        iconUrl: 'https://tvcharts.co/logo.svg',
+        imdbSearchUrl: 'https://tvcharts.co/show/$Id',
     },
     {
         name: 'Rotten Tomatoes',
@@ -249,4 +255,3 @@ function addLink(site, imdbId, tmdbId, mediaTitle, externalLinksUl) {
         }
     });
 })();
-
