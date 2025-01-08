@@ -34,6 +34,9 @@ const SITES = [{
         icon: 'fa-brands fa-square-letterboxd',
         iconUrl: 'https://tvcharts.co/logo.svg',
         imdbSearchUrl: 'https://tvcharts.co/show/$Id',
+        tmdbSearchUrl: 'https://tvcharts.co/show/$Id',
+        nameSearchUrl: 'https://tvcharts.co/search/$Id'
+
     },
     {
         name: 'Rotten Tomatoes',
