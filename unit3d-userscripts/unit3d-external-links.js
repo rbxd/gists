@@ -6,8 +6,8 @@
 // @author       rbxd
 // @match        *://*/torrents/*
 // @match        *://*/requests/*
-// @updateURL    https://raw.githubusercontent.com/rbxd/gists/unit3d-extlinks/unit3d-external-links.js
-// @downloadURL  https://raw.githubusercontent.com/rbxd/gists/unit3d-extlinks/unit3d-external-links.js
+// @updateURL    https://raw.githubusercontent.com/rbxd/gists/refs/heads/master/unit3d-userscripts/unit3d-external-links.js
+// @downloadURL  https://raw.githubusercontent.com/rbxd/gists/refs/heads/master/unit3d-userscripts/unit3d-external-links.js
 // ==/UserScript==
 
 //TODO: Grab/parse media title from torrent title, not metadata title
