@@ -24,7 +24,7 @@ const TV_ONLY_SITES = ['BroadcasTheNet', 'TV Vault', 'tvcharts'];
 const SITES = [{
         name: 'Letterboxd',
         icon: 'fa-brands fa-square-letterboxd',
-        iconUrl: 'https://a.ltrbxd.com/logos/letterboxd-decal-dots-pos-rgb-500px.png',
+        iconUrl: 'https://oort.in.rbxd.org/p/lb.png',
         imdbSearchUrl: 'https://letterboxd.com/imdb/$Id',
         tmdbSearchUrl: 'https://letterboxd.com/tmdb/$Id',
         nameSearchUrl: 'https://letterboxd.com/search/?q=$Id'
@@ -177,7 +177,7 @@ function addLink(site, imdbId, tmdbId, mediaTitle, externalLinksUl) {
     }
     if (searchUrl != '') {
         let newLink = document.createElement('a');
-        newLink.innerHTML = `<a href="${searchUrl}" title="${site.name}" target="_blank" class="meta-id-tag"><img src="${site.iconUrl}" style="width: 35px"><div></div></a>`;
+        newLink.innerHTML = `<a href="${searchUrl}" title="${site.name}" target="_blank" class="meta-id-tag"><img src="${site.iconUrl}"><div></div></a>`;
         externalLinksUl.appendChild(newLink);
     }
 }
