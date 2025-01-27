@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         External Links on UNIT3D
 // @namespace    N/A
-// @version      0.4
+// @version      0.5
 // @description  Add links to other sites on the metadata section of a torrent item
 // @author       rbxd
 // @match        *://*/torrents/*
